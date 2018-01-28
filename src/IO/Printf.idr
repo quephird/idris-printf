@@ -33,16 +33,18 @@ data Format = Number Format
 -- and recursively builds and returns a Format type
 toFormat : (xs : List Char) -> Format
 toFormat [] = End
-toFormat ('%' :: 'd' :: chars) = Number (toFormat chars)
-toFormat ('%' :: 'o' :: chars) = Oct (toFormat chars)
-toFormat ('%' :: 'x' :: chars) = Hex (toFormat chars)
-toFormat ('%' :: 's' :: chars) = Str (toFormat chars)
-toFormat ('%' :: 'c' :: chars) = Chr (toFormat chars)
-toFormat ('%' :: 'f' :: chars) = Dbl (toFormat chars)
-toFormat ('%' :: chars)        = Lit "%" (toFormat chars)
-toFormat (c :: chars)          = case toFormat chars of
-                                   Lit lit chars' => Lit (strCons c lit) chars'
-                                   fmt => Lit (strCons c "") fmt
+toFormat ('%' :: 'd' :: chars)        = Number (toFormat chars)
+toFormat ('%' :: 'o' :: chars)        = Oct (toFormat chars)
+toFormat ('%' :: '#' :: 'o' :: chars) = Lit "0" $ Oct (toFormat chars)
+toFormat ('%' :: 'x' :: chars)        = Hex (toFormat chars)
+toFormat ('%' :: '#' :: 'x' :: chars) = Lit "0x" $ Hex (toFormat chars)
+toFormat ('%' :: 's' :: chars)        = Str (toFormat chars)
+toFormat ('%' :: 'c' :: chars)        = Chr (toFormat chars)
+toFormat ('%' :: 'f' :: chars)        = Dbl (toFormat chars)
+toFormat ('%' :: chars)               = Lit "%" (toFormat chars)
+toFormat (c :: chars)                 = case toFormat chars of
+                                          Lit lit chars' => Lit (strCons c lit) chars'
+                                          fmt => Lit (strCons c "") fmt
 
 -- This is also a recursive type that describes
 -- the return type of the printf function
